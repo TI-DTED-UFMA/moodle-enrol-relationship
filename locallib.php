@@ -229,7 +229,7 @@ function enrol_relationship_enrol_users(progress_trace $trace, $courseid = NULL,
               JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextcourse)
          LEFT JOIN {user_enrolments} ue ON (ue.enrolid = e.id AND ue.userid = rm.userid)
          LEFT JOIN {role_assignments} ra ON (ra.userid = rm.userid AND ra.contextid = ctx.id AND ra.roleid = rc.roleid AND ra.itemid = e.id AND ra.component = 'enrol_relationship')
-             WHERE ISNULL(ra.id) OR ue.status = :suspended";
+             WHERE (coalesce(ra.id,1) =1) OR ue.status = :suspended";
     $rs = $DB->get_recordset_sql($sql, $params);
     foreach($rs as $r) {
         if (!isset($instances[$r->enrolid])) {
@@ -281,7 +281,7 @@ function enrol_relationship_unenrol_users(progress_trace $trace, $courseid = NUL
          LEFT JOIN {relationship_members} rm ON (rm.relationshipcohortid = rc.id AND rm.userid = ue.userid)
              WHERE e.enrol = 'relationship'
                AND e.customint3 != :enrolkeepremoved
-               AND (ISNULL(rm.id) OR e.customint2 = :onlysyncgroups)";
+               AND ((coalesce(rm.id,1)=1) OR e.customint2 = :onlysyncgroups)";
     $rs = $DB->get_recordset_sql($sql, $params);
     foreach($rs as $r) {
         if (!isset($instances[$r->enrolid])) {
