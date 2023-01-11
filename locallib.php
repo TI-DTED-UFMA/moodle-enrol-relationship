@@ -281,7 +281,7 @@ function enrol_relationship_unenrol_users(progress_trace $trace, $courseid = NUL
          LEFT JOIN {relationship_members} rm ON (rm.relationshipcohortid = rc.id AND rm.userid = ue.userid)
              WHERE e.enrol = 'relationship'
                AND e.customint3 != :enrolkeepremoved
-               AND (ISNULL(rm.id) OR e.customint2 = :onlysyncgroups)";
+               AND ((coalesce(rm.id,1)=1) OR e.customint2 = :onlysyncgroups)";
     $rs = $DB->get_recordset_sql($sql, $params);
     foreach($rs as $r) {
         if (!isset($instances[$r->enrolid])) {
